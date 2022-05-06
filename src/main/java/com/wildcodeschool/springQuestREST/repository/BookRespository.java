@@ -10,7 +10,5 @@ import com.wildcodeschool.springQuestREST.entity.Book;
 @Repository
 public interface BookRespository extends JpaRepository<Book, Integer> {
 
-    // TODO
-    List<Book> findByTitleContainingOrAuthorContainingOrDescriptionContaining(String text, String textAgain, String textAgainAgain);
-    List<Book> findByTitleOrAuthorOrDescription(String text, String textAgain, String textAgainAgain);
+    List<Book> findByTitleContainingOrDescriptionContaining(String text, String textAgain);
 }

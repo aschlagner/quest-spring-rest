@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,22 +31,20 @@ public class BookController {
         return BookRespository.save(Book);
     }
 
+    // Bug: "In Spring Data JPA 2.6.3, an error occurs when the field Contains is queried for the second time"
+    // https://github.com/spring-projects/spring-data-jpa/issues/2472
+    // WORKAROUND: Using spring boot 2.6.2 version instead of the newest version to fix the problem.
     @GetMapping("/books")
-    public List<Book> index(){
+    public List<Book> index(@RequestParam(name="search",required=false) String search) {
+        if (search != null) {
+            return BookRespository.findByTitleContainingOrDescriptionContaining(search, search);
+        }
         return BookRespository.findAll();
     }
 
     @GetMapping("/books/{id}")
     public Book show(@PathVariable int id){
         return BookRespository.findById(id).get();
-    }
-
-    //TODO: Only first time running
-    @PostMapping("/books/search")
-    public List<Book> search(@RequestBody Map<String, String> body){
-        String searchTerm = body.get("text");
-        //return BookRespository.findByTitleContainingOrAuthorContainingOrDescriptionContaining(searchTerm, searchTerm, searchTerm);  // NotOK
-        return BookRespository.findByTitleOrAuthorOrDescription(searchTerm, searchTerm, searchTerm);  // OK
     }
 
     @PutMapping("/books/{id}")
